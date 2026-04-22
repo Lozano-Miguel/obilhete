@@ -5,9 +5,9 @@ export const runtime = "edge";
 
 export async function GET(
   _request: Request,
-  { params }: { params: { username: string } },
+  { params }: { params: Promise<{ username: string }> },
 ) {
-  const { username } = params;
+  const { username } = await params;
 
   return new ImageResponse(
     React.createElement(
@@ -37,8 +37,9 @@ export async function GET(
       ),
     ),
     {
-    width: 1200,
-    height: 630,
-  });
+      width: 1200,
+      height: 630,
+    },
+  );
 }
 

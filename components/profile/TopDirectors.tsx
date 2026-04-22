@@ -1,6 +1,7 @@
 "use client";
 
 import type { FilmEntry, ProfileStats } from "@/types";
+import Image from "next/image";
 
 function directorMatches(filmDirector: string | undefined, target: string): boolean {
   const a = filmDirector?.trim().toLowerCase() ?? "";
@@ -42,9 +43,11 @@ export function TopDirectors({
             <li key={name} className="flex items-center gap-3">
               <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border border-[#e8c547]/45 ring-1 ring-[#e8c547]/20">
                 {photoUrl ? (
-                  <img
+                  <Image
                     src={photoUrl}
                     alt={name}
+                    width={48}
+                    height={48}
                     className="h-full w-full rounded-full object-cover"
                   />
                 ) : (

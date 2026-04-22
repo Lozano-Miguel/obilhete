@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
+import Image from "next/image";
 import type { Recommendation } from "@/types";
 
 import { recommendationCardVariants } from "./MovieCard";
@@ -37,9 +38,11 @@ export function BookCard({ item, variants = recommendationCardVariants }: BookCa
       <div className="flex gap-4 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#111111] p-4">
       <div className="relative flex h-28 w-[4.5rem] shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#e8c547]/45 bg-[#0a0a0a] px-1.5">
         {item.posterUrl ? (
-          <img
+          <Image
             src={item.posterUrl}
             alt={item.title}
+            width={72}
+            height={112}
             className="h-full w-full rounded-lg object-cover"
           />
         ) : (
