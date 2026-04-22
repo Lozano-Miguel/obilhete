@@ -12,7 +12,7 @@ import {
   getRecommendationsAndTag,
 } from "@/lib/gemini";
 import { getCachedProfile, upsertCachedProfile } from "@/lib/cache";
-import type { CachedProfile } from "@/types";
+import type { CachedProfile, ProfileStats } from "@/types";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -94,9 +94,12 @@ export async function POST(req: Request) {
     const { recommendations: rawRecommendations, personalityTag } =
       await getRecommendationsAndTag(statsBase, enrichedFilms);
     const recommendations = await enrichRecommendationsWithPosters(rawRecommendations);
-    stats.personalityTag = personalityTag;
+    const fullStats: ProfileStats = {
+      ...stats,
+      personalityTag,
+    };
     const directorPhotos: Record<string, string | null> = {};
-    const topFiveDirectors = stats.topDirectors.slice(0, 5);
+    const topFiveDirectors = fullStats.topDirectors.slice(0, 5);
     for (let i = 0; i < topFiveDirectors.length; i++) {
       const director = topFiveDirectors[i];
       directorPhotos[director] = await getDirectorPhoto(director);
@@ -108,14 +111,14 @@ export async function POST(req: Request) {
       lastFetchedAt: new Date().toISOString(),
       profile,
       films: enrichedFilms,
-      stats,
+      stats: fullStats,
       recommendations,
       directorPhotos,
     };
 
     const shouldUpsert =
       enrichedFilms.length > 0 &&
-      stats.totalFilms > 0 &&
+      fullStats.totalFilms > 0 &&
       recommendations.length > 0;
 
     if (shouldUpsert) {
