@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { ProfilePageClient } from "@/components/profile/ProfilePageClient";
+import { getCachedProfile } from "@/lib/cache";
+
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? "https://obilhete.vercel.app";
 
 export async function generateMetadata({
   params,
@@ -8,18 +12,26 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { username: raw } = await params;
   const username = decodeURIComponent(raw);
+  const normalizedUsername = username.replace(/^@+/, "").toLowerCase();
+  const cached = await getCachedProfile(normalizedUsername);
+  const displayName = cached?.profile?.displayName ?? username;
+  const personalityTag = cached?.stats?.personalityTag ?? "Cinefilo";
+  const totalFilms = cached?.stats?.totalFilms ?? 0;
 
   return {
-    title: `${username} — O Bilhete`,
-    description: `Descobre o perfil cinéfilo de ${username}`,
+    title: `${displayName} no O Bilhete — ${personalityTag}`,
+    description: `${displayName} já viu ${totalFilms} filmes. Descobre a sua personalidade cinéfila, géneros favoritos e recomendações personalizadas em obilhete.pt`,
     openGraph: {
-      title: `${username} — O Bilhete`,
-      description: `Descobre o perfil cinéfilo de ${username}`,
-      images: [`/api/og/${encodeURIComponent(username)}`],
+      title: `${displayName} — ${personalityTag}`,
+      description: `${displayName} já viu ${totalFilms} filmes. Vê as suas estatísticas e recomendações em obilhete.pt`,
+      images: [`${BASE_URL}/api/og/${encodeURIComponent(normalizedUsername)}`],
+      url: `${BASE_URL}/${encodeURIComponent(normalizedUsername)}`,
     },
     twitter: {
       card: "summary_large_image",
-      images: [`/api/og/${encodeURIComponent(username)}`],
+      title: `${displayName} — ${personalityTag}`,
+      description: `${displayName} já viu ${totalFilms} filmes.`,
+      images: [`${BASE_URL}/api/og/${encodeURIComponent(normalizedUsername)}`],
     },
   };
 }
