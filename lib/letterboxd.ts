@@ -4,8 +4,8 @@ import * as cheerio from "cheerio";
 import type { FilmEntry, LetterboxdProfile } from "@/types";
 
 function proxied(url: string): string {
-  const key = process.env.SCRAPINGANT_API_KEY;
-  return `https://api.scrapingant.com/v2/general?url=${encodeURIComponent(url)}&x-api-key=${key}&browser=true&wait_for_selector=${encodeURIComponent("ul.films-list")}`;
+  const key = process.env.SCRAPER_API_KEY;
+  return `http://api.scraperapi.com?api_key=${key}&url=${encodeURIComponent(url)}&render=false`;
 }
 
 const client = axios.create({
