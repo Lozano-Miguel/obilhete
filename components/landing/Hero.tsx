@@ -85,7 +85,7 @@ export function Hero({ totalProfiles }: HeroProps) {
           animate={fadeUp.animate}
           transition={staggerDelay(3)}
         >
-          <div className="flex w-full flex-col gap-3 rounded-full border border-[rgba(255,255,255,0.08)] bg-[#111111] p-1.5 pl-5 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset] sm:flex-row sm:items-center sm:gap-0 sm:pl-6">
+          <div className="flex w-full max-w-md flex-col gap-2 md:flex-row">
             <label htmlFor="letterboxd-username" className="sr-only">
               Username ou link do Letterboxd
             </label>
@@ -97,11 +97,11 @@ export function Hero({ totalProfiles }: HeroProps) {
               placeholder="username ou link do Letterboxd"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="min-h-[48px] w-full flex-1 bg-transparent py-3 text-[15px] text-[#ffffff] outline-none placeholder:text-[#888888] sm:py-0"
+              className="min-h-[48px] w-full rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#111111] px-5 py-3 text-[15px] text-[#ffffff] outline-none placeholder:text-[#888888] shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset] md:flex-1 md:rounded-full"
             />
             <button
               type="submit"
-              className="inline-flex min-h-[48px] shrink-0 items-center justify-center rounded-full bg-[#e8c547] px-7 text-sm font-semibold text-[#0a0a0a] transition-[filter] hover:brightness-105 active:brightness-95"
+              className="inline-flex min-h-[48px] w-full shrink-0 items-center justify-center rounded-xl bg-[#e8c547] px-6 py-3 text-sm font-semibold text-[#0a0a0a] transition-[filter] hover:brightness-105 active:brightness-95 md:w-auto md:rounded-full"
             >
               Analisar →
             </button>

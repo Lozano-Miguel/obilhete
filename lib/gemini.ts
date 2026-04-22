@@ -47,7 +47,7 @@ export async function getRecommendationsAndTag(
   stats: Omit<ProfileStats, "personalityTag">,
   films: FilmEntry[],
 ): Promise<{ recommendations: Recommendation[]; personalityTag: string }> {
-  const GEMINI_MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+  const GEMINI_MODELS = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"];
   const fallback = {
     personalityTag: "Cinephile em descoberta",
     recommendations: [] as Recommendation[],

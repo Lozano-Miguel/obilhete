@@ -131,7 +131,8 @@ Table: cached_profiles
 - Ratings: user has no ratings, ratingDistribution will be all zeros — hide rating section from UI if ratedFilms === 0
 - Books do not have posterUrl — use a placeholder book cover in UI
 - data-film-id removed from Letterboxd HTML, using slug as identifier
-- Gemini fallback chain: 2.5-flash → 2.0-flash → 1.5-flash
+- gemini-2.0-flash deprecated, removed from fallback chain
+- Fallback chain is now: 2.5-flash → 2.5-flash-lite → 1.5-flash
 
 ## Environment Variables
 NEXT_PUBLIC_SUPABASE_URL=
