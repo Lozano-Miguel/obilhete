@@ -54,6 +54,7 @@ const sectionVariants = {
 
 function ProfileReadyView({ data }: { data: CachedProfile }) {
   const { stats, recommendations } = data;
+  const [copied, setCopied] = useState(false);
 
   const genreData = useMemo(
     () =>
@@ -73,8 +74,33 @@ function ProfileReadyView({ data }: { data: CachedProfile }) {
     [stats.countryBreakdown],
   );
 
+  async function handleShare() {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      return;
+    }
+
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  }
+
   return (
     <main className="min-h-screen bg-[#0a0a0a] px-6 py-10 md:px-10">
+      <AnimatePresence>
+        {copied ? (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-[#e8c547]/35 bg-[#111111] px-4 py-2 text-sm font-medium text-[#e8c547] shadow-lg"
+          >
+            Link copiado!
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
       <motion.div
         className="mx-auto flex max-w-6xl flex-col gap-10"
         variants={listVariants}
@@ -82,7 +108,7 @@ function ProfileReadyView({ data }: { data: CachedProfile }) {
         animate="show"
       >
         <motion.div variants={sectionVariants}>
-          <ProfileHeader data={data} />
+          <ProfileHeader data={data} onShare={handleShare} />
         </motion.div>
 
         <motion.div variants={sectionVariants}>

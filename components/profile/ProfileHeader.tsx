@@ -10,7 +10,13 @@ function normalizeAvatarUrl(url: string) {
   return u;
 }
 
-export function ProfileHeader({ data }: { data: CachedProfile }) {
+export function ProfileHeader({
+  data,
+  onShare,
+}: {
+  data: CachedProfile;
+  onShare?: () => void;
+}) {
   const { profile, stats } = data;
   const avatarSrc = normalizeAvatarUrl(profile.avatarUrl);
 
@@ -49,12 +55,21 @@ export function ProfileHeader({ data }: { data: CachedProfile }) {
             </div>
           </div>
         </div>
-        <Link
-          href="/"
-          className="shrink-0 text-sm text-[#888888] underline-offset-4 transition-colors hover:text-[#ffffff] hover:underline"
-        >
-          ← Início
-        </Link>
+        <div className="flex shrink-0 flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={onShare}
+            className="inline-flex items-center justify-center rounded-full border border-[rgba(255,255,255,0.08)] bg-[#0a0a0a] px-4 py-2 text-sm font-medium text-[#ffffff] transition-colors hover:border-[#e8c547]/40 hover:text-[#e8c547]"
+          >
+            Partilhar perfil
+          </button>
+          <Link
+            href="/"
+            className="text-sm text-[#888888] underline-offset-4 transition-colors hover:text-[#ffffff] hover:underline"
+          >
+            ← Início
+          </Link>
+        </div>
       </div>
     </div>
   );
