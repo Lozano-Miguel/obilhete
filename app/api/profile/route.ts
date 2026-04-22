@@ -70,22 +70,31 @@ export async function POST(req: Request) {
 
     console.log(`[profile] scraping films for @${username}`);
     const films = await scrapeFilms(username);
+    console.log("[pipeline] scraped films count:", films.length);
 
     console.log(`[profile] scraping rss ratings for @${username}`);
     const ratings = await scrapeRatings(username);
-    const merged = mergeRatings(films, ratings);
+    const mergedFilms = mergeRatings(films, ratings);
+    console.log("[pipeline] after merge ratings count:", mergedFilms.length);
 
     console.log(`[profile] enriching with tmdb for @${username}`);
-    const enrichedFilms = await enrichFilms(merged);
+    const enrichedFilms = await enrichFilms(mergedFilms);
+    console.log("[pipeline] after enrichment count:", enrichedFilms.length);
+    console.log(
+      "[pipeline] first enriched film sample:",
+      JSON.stringify(enrichedFilms[0]),
+    );
 
     console.log(`[profile] building stats for @${username}`);
     const statsBase = buildProfileStats(enrichedFilms);
+    const stats = { ...statsBase };
+    console.log("[pipeline] stats totalFilms:", stats.totalFilms);
 
     console.log(`[profile] getting recommendations/tag for @${username}`);
     const { recommendations: rawRecommendations, personalityTag } =
       await getRecommendationsAndTag(statsBase, enrichedFilms);
     const recommendations = await enrichRecommendationsWithPosters(rawRecommendations);
-    const stats = { ...statsBase, personalityTag };
+    stats.personalityTag = personalityTag;
     const directorPhotos: Record<string, string | null> = {};
     const topFiveDirectors = stats.topDirectors.slice(0, 5);
     for (let i = 0; i < topFiveDirectors.length; i++) {
@@ -104,7 +113,16 @@ export async function POST(req: Request) {
       directorPhotos,
     };
 
-    await upsertCachedProfile(data);
+    const shouldUpsert =
+      enrichedFilms.length > 0 &&
+      stats.totalFilms > 0 &&
+      recommendations.length > 0;
+
+    if (shouldUpsert) {
+      await upsertCachedProfile(data);
+    } else {
+      console.log("[cache] skipping upsert — incomplete data");
+    }
 
     return NextResponse.json({ ...data, cached: false }, { status: 200 });
   } catch (err) {

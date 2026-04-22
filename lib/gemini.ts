@@ -47,6 +47,7 @@ export async function getRecommendationsAndTag(
   stats: Omit<ProfileStats, "personalityTag">,
   films: FilmEntry[],
 ): Promise<{ recommendations: Recommendation[]; personalityTag: string }> {
+  const GEMINI_MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
   const fallback = {
     personalityTag: "Cinephile em descoberta",
     recommendations: [] as Recommendation[],
@@ -145,24 +146,62 @@ export async function getRecommendationsAndTag(
     ].join("\n");
 
     const geminiApiKey = process.env.GEMINI_API_KEY!;
-    console.log("[gemini] calling gemini-2.5-flash...");
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-        }),
-      },
-    );
+    let result: unknown = null;
+    let requestSucceeded = false;
 
-    const result = await geminiRes.json();
-    if (!geminiRes.ok) {
-      throw new Error(
-        (result as { error?: { message?: string } })?.error?.message ??
-          "Gemini request failed",
-      );
+    for (const model of GEMINI_MODELS) {
+      let shouldTryNextModel = false;
+
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        const geminiRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+            }),
+          },
+        );
+
+        const attemptResult = await geminiRes.json();
+        if (geminiRes.ok) {
+          result = attemptResult;
+          requestSucceeded = true;
+          console.log(`[gemini] success with model: ${model}`);
+          break;
+        }
+
+        const errorMessage =
+          (attemptResult as { error?: { message?: string } })?.error?.message ??
+          "Gemini request failed";
+        const normalizedErrorMessage = errorMessage.toLowerCase();
+        const isOverloaded =
+          geminiRes.status === 429 ||
+          geminiRes.status === 503 ||
+          normalizedErrorMessage.includes("demand") ||
+          normalizedErrorMessage.includes("overload") ||
+          normalizedErrorMessage.includes("quota");
+
+        if (isOverloaded) {
+          if (attempt < 2) {
+            await sleep(3000);
+            continue;
+          }
+          console.log(`[gemini] ${model} overloaded, trying next...`);
+          shouldTryNextModel = true;
+          break;
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      if (requestSucceeded) break;
+      if (shouldTryNextModel) continue;
+    }
+
+    if (!requestSucceeded || !result) {
+      throw new Error("All Gemini models failed");
     }
 
     const text =
@@ -232,7 +271,7 @@ export async function getRecommendationsAndTag(
     console.log("[gemini] getRecommendationsAndTag failed", {
       message: err instanceof Error ? err.message : String(err),
     });
-    return fallback;
+    throw err;
   }
 }
 

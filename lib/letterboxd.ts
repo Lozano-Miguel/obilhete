@@ -87,26 +87,31 @@ export async function scrapeFilms(username: string): Promise<FilmEntry[]> {
   const totalPages = Math.max(1, asNumber(totalPagesText));
   console.log(`[letterboxd] total pages = ${totalPages}`);
 
-  const all: FilmEntry[] = [];
+  const allFilms: FilmEntry[] = [];
 
   for (let page = 1; page <= totalPages; page++) {
     const url = `${base}page/${page}/`;
     const res = page === 1 ? firstRes : await fetchText(url);
-    const $ = page === 1 ? $first : cheerio.load(res.data);
+    const html = res.data;
+    const $ = cheerio.load(html);
 
     const nodes = $("ul.grid li.griditem div.react-component");
     console.log(`[letterboxd] page ${page}/${totalPages} films=${nodes.length}`);
 
+    const pageFilms: FilmEntry[] = [];
     nodes.each((_i, el) => {
       const itemName = $(el).attr("data-item-name")?.trim() || "";
       const slug = $(el).attr("data-item-slug")?.trim() || "";
-      const letterboxdId = $(el).attr("data-film-id")?.trim() || "";
+      const letterboxdId =
+        $(el).attr("data-film-id")?.trim() ||
+        $(el).attr("data-postered-identifier")?.trim() ||
+        slug;
 
-      if (!itemName || !slug || !letterboxdId) return;
+      if (!itemName || !slug) return;
 
       const { title, year } = parseTitleYear(itemName);
 
-      all.push({
+      pageFilms.push({
         title,
         year,
         slug,
@@ -114,6 +119,7 @@ export async function scrapeFilms(username: string): Promise<FilmEntry[]> {
         userRating: null,
       });
     });
+    allFilms.push(...pageFilms);
 
     // Follow spec: detect pagination next page (debug-only)
     const nextHref = $(".paginate-nextprev a.next").attr("href")?.trim();
@@ -122,7 +128,8 @@ export async function scrapeFilms(username: string): Promise<FilmEntry[]> {
     if (page < totalPages) await sleep(800);
   }
 
-  return all;
+  console.log("[letterboxd] scrapeFilms returning:", allFilms.length, "films");
+  return allFilms;
 }
 
 export async function scrapeRatings(username: string): Promise<Map<string, number>> {

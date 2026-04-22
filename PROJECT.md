@@ -118,7 +118,7 @@ Table: cached_profiles
 - [x] Prompt 10 — Fix Gemini (REST API + gemini-2.5-flash)
 - [x] Prompt 11 — Fix Gemini output (strict JSON, 6 movies + 4 books)
 - [x] Prompt 12 — Exclude watched films from recommendations
-- [ ] Prompt 13 — Polish + animations
+- [x] Prompt 13 — Polish + animations
 
 ## Known Issues / Decisions
 - Letterboxd has no public API — using scraper
@@ -130,6 +130,8 @@ Table: cached_profiles
 - Gemini language: all output in Portuguese (personalityTag + reasons)
 - Ratings: user has no ratings, ratingDistribution will be all zeros — hide rating section from UI if ratedFilms === 0
 - Books do not have posterUrl — use a placeholder book cover in UI
+- data-film-id removed from Letterboxd HTML, using slug as identifier
+- Gemini fallback chain: 2.5-flash → 2.0-flash → 1.5-flash
 
 ## Environment Variables
 NEXT_PUBLIC_SUPABASE_URL=
