@@ -266,7 +266,19 @@ export async function getRecommendationsAndTag(
       }))
       .filter((r) => r.title && Number.isFinite(r.year) && r.year > 0 && r.reason);
 
-    return { personalityTag, recommendations };
+    const watchedSlugsSet = new Set(
+      films.map((f) => f.title.toLowerCase().trim()),
+    );
+    const filteredRecommendations = recommendations.filter(
+      (rec) =>
+        rec.type === "book" || !watchedSlugsSet.has(rec.title.toLowerCase().trim()),
+    );
+    const filteredOutCount = recommendations.length - filteredRecommendations.length;
+    console.log(
+      `[gemini] filtered out ${filteredOutCount} already-watched recommendations`,
+    );
+
+    return { personalityTag, recommendations: filteredRecommendations };
   } catch (err) {
     console.log("[gemini] getRecommendationsAndTag failed", {
       message: err instanceof Error ? err.message : String(err),

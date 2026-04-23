@@ -29,8 +29,10 @@ export function RecommendationsSection({
   recommendations: initial,
 }: RecommendationsSectionProps) {
   const [{ movies, books }, setSplit] = useState(() => splitRecommendations(initial));
+  const [showAllMovies, setShowAllMovies] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const moviesToShow = showAllMovies ? movies : movies.slice(0, 3);
 
   const movieKeys = useMemo(
     () => movies.map((m) => `m-${m.title}-${m.year}`).join("|"),
@@ -63,6 +65,7 @@ export function RecommendationsSection({
       }
       const next = (json as { recommendations: Recommendation[] }).recommendations;
       setSplit(splitRecommendations(next));
+      setShowAllMovies(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao atualizar.");
     } finally {
@@ -77,16 +80,28 @@ export function RecommendationsSection({
           O teu próximo filme
         </h2>
         <motion.div
-          key={movieKeys}
+          key={`${movieKeys}-${showAllMovies ? "all" : "top3"}`}
           className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3"
           variants={staggerContainer}
           initial="hidden"
           animate="show"
+          layout
         >
-          {movies.map((item) => (
+          {moviesToShow.map((item) => (
             <MovieCard key={`${item.title}-${item.year}`} item={item} />
           ))}
         </motion.div>
+        {movies.length > 3 ? (
+          <div className="mt-5 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setShowAllMovies((prev) => !prev)}
+              className="rounded-full px-2 py-1 text-sm font-medium text-[#e8c547] transition-opacity hover:opacity-80"
+            >
+              {showAllMovies ? "Ver menos ↑" : "Ver mais filmes →"}
+            </button>
+          </div>
+        ) : null}
       </div>
 
       <div>

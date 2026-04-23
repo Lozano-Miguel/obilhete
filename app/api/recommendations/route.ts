@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getRecommendationsAndTag } from "@/lib/gemini";
-import { supabase } from "@/lib/supabase";
+import sql from "@/lib/db";
 import type { FilmEntry, ProfileStats, Recommendation } from "@/types";
 
 export async function GET(req: Request) {
@@ -55,16 +55,23 @@ export async function POST(req: Request) {
   }
   const username = rawUsername.toLowerCase().trim();
 
-  const { data, error } = await supabase
-    .from("cached_profiles")
-    .select("username, stats, films")
-    .eq("username", username)
-    .limit(1)
-    .maybeSingle();
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  let data: { username: string; stats: ProfileStats; films: FilmEntry[] | null } | null =
+    null;
+  try {
+    const rows = await sql<
+      { username: string; stats: ProfileStats; films: FilmEntry[] | null }[]
+    >`
+      SELECT username, stats, films
+      FROM cached_profiles
+      WHERE username = ${username}
+      LIMIT 1
+    `;
+    data = rows[0] ?? null;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
+
   if (!data) {
     return NextResponse.json({ error: "Profile not cached" }, { status: 404 });
   }
@@ -78,13 +85,15 @@ export async function POST(req: Request) {
     films,
   );
 
-  const { error: upErr } = await supabase
-    .from("cached_profiles")
-    .update({ recommendations })
-    .eq("username", username);
-
-  if (upErr) {
-    return NextResponse.json({ error: upErr.message }, { status: 500 });
+  try {
+    await sql`
+      UPDATE cached_profiles
+      SET recommendations = ${sql.json(recommendations)}
+      WHERE username = ${username}
+    `;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 
   return NextResponse.json({ recommendations }, { status: 200 });

@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import sql from "@/lib/db";
 import type { CachedProfile } from "@/types";
 
 const CACHE_TTL_HOURS = 24;
@@ -26,17 +26,13 @@ export async function getCachedProfile(
   username: string,
 ): Promise<CachedProfile | null> {
   try {
-    const { data, error } = await supabase
-      .from("cached_profiles")
-      .select("*")
-      .eq("username", username)
-      .limit(1)
-      .maybeSingle();
-
-    if (error) {
-      console.log("[cache] getCachedProfile error", error.message);
-      return null;
-    }
+    const rows = await sql<CachedProfilesRow[]>`
+      SELECT *
+      FROM cached_profiles
+      WHERE username = ${username}
+      LIMIT 1
+    `;
+    const data = rows[0] ?? null;
     if (!data) return null;
 
     const row = data as unknown as CachedProfilesRow;
@@ -73,13 +69,35 @@ export async function upsertCachedProfile(data: CachedProfile): Promise<void> {
       director_photos: data.directorPhotos ?? {},
     };
 
-    const { error } = await supabase
-      .from("cached_profiles")
-      .upsert(payload, { onConflict: "username", ignoreDuplicates: false });
-
-    if (error) {
-      console.log("[cache] upsertCachedProfile error", error.message);
-    }
+    await sql`
+      INSERT INTO cached_profiles (
+        id,
+        username,
+        last_fetched_at,
+        profile,
+        films,
+        stats,
+        recommendations,
+        director_photos
+      ) VALUES (
+        ${payload.id},
+        ${payload.username},
+        ${payload.last_fetched_at},
+        ${sql.json(payload.profile)},
+        ${sql.json(payload.films)},
+        ${sql.json(payload.stats)},
+        ${sql.json(payload.recommendations)},
+        ${sql.json(payload.director_photos)}
+      )
+      ON CONFLICT (username) DO UPDATE SET
+        id = EXCLUDED.id,
+        last_fetched_at = EXCLUDED.last_fetched_at,
+        profile = EXCLUDED.profile,
+        films = EXCLUDED.films,
+        stats = EXCLUDED.stats,
+        recommendations = EXCLUDED.recommendations,
+        director_photos = EXCLUDED.director_photos
+    `;
   } catch (err) {
     console.log("[cache] upsertCachedProfile exception", {
       message: err instanceof Error ? err.message : String(err),
@@ -89,15 +107,11 @@ export async function upsertCachedProfile(data: CachedProfile): Promise<void> {
 
 export async function getTotalProfilesCount(): Promise<number> {
   try {
-    const { count, error } = await supabase
-      .from("cached_profiles")
-      .select("*", { count: "exact", head: true });
-
-    if (error) {
-      console.log("[cache] getTotalProfilesCount error", error.message);
-      return 0;
-    }
-    return typeof count === "number" ? count : 0;
+    const rows = await sql<{ count: number }[]>`
+      SELECT COUNT(*)::int AS count
+      FROM cached_profiles
+    `;
+    return rows[0]?.count ?? 0;
   } catch (err) {
     console.log("[cache] getTotalProfilesCount exception", {
       message: err instanceof Error ? err.message : String(err),

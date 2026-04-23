@@ -23,8 +23,8 @@ export function BookCard({ item, variants = recommendationCardVariants }: BookCa
   const pct = matchPercent(item.matchScore);
   const author =
     item.author && item.author.trim() ? item.author.trim() : null;
-  const searchHref = `https://www.google.com/search?q=${encodeURIComponent(
-    `${item.title} ${item.author ?? ""} livro`.trim(),
+  const searchHref = `https://www.goodreads.com/search?q=${encodeURIComponent(
+    `${item.title} ${item.author ?? ""}`,
   )}`;
 
   return (
