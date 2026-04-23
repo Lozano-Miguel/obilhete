@@ -88,7 +88,7 @@ export async function POST(req: Request) {
   try {
     await sql`
       UPDATE cached_profiles
-      SET recommendations = ${sql.json(recommendations)}
+      SET recommendations = ${JSON.stringify(recommendations)}::jsonb
       WHERE username = ${username}
     `;
   } catch (error) {

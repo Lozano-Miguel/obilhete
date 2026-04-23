@@ -58,8 +58,8 @@ export async function getCachedProfile(
 
 export async function upsertCachedProfile(data: CachedProfile): Promise<void> {
   try {
+    const profileId = data.id ?? null;
     const payload = {
-      id: data.id,
       username: data.username,
       last_fetched_at: new Date().toISOString(),
       profile: data.profile,
@@ -80,17 +80,16 @@ export async function upsertCachedProfile(data: CachedProfile): Promise<void> {
         recommendations,
         director_photos
       ) VALUES (
-        ${payload.id},
+        COALESCE(${profileId}::uuid, gen_random_uuid()),
         ${payload.username},
         ${payload.last_fetched_at},
-        ${sql.json(payload.profile)},
-        ${sql.json(payload.films)},
-        ${sql.json(payload.stats)},
-        ${sql.json(payload.recommendations)},
-        ${sql.json(payload.director_photos)}
+        ${JSON.stringify(payload.profile)}::jsonb,
+        ${JSON.stringify(payload.films)}::jsonb,
+        ${JSON.stringify(payload.stats)}::jsonb,
+        ${JSON.stringify(payload.recommendations)}::jsonb,
+        ${JSON.stringify(payload.director_photos)}::jsonb
       )
       ON CONFLICT (username) DO UPDATE SET
-        id = EXCLUDED.id,
         last_fetched_at = EXCLUDED.last_fetched_at,
         profile = EXCLUDED.profile,
         films = EXCLUDED.films,
