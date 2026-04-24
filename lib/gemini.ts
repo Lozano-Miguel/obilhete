@@ -227,28 +227,6 @@ export async function getRecommendationsAndTag(
 
     const recsRaw = Array.isArray(obj.recommendations) ? obj.recommendations : [];
 
-    const moviesCount = recsRaw.filter((r) => {
-      if (!r || typeof r !== "object") return false;
-      return (r as { type?: unknown }).type === "movie";
-    }).length;
-    const booksCount = recsRaw.filter((r) => {
-      if (!r || typeof r !== "object") return false;
-      return (r as { type?: unknown }).type === "book";
-    }).length;
-
-    if (recsRaw.length !== 10) {
-      console.log(
-        `[gemini] warning: expected 10 recommendations, got ${recsRaw.length}`,
-      );
-    }
-    if (moviesCount !== 6) {
-      console.log(`[gemini] warning: expected 6 movies, got ${moviesCount}`);
-    }
-    if (booksCount !== 4) {
-      console.log(`[gemini] warning: expected 4 books, got ${booksCount}`);
-    }
-    console.log(`[gemini] parsed: ${moviesCount} movies, ${booksCount} books`);
-
     const recommendations: Recommendation[] = recsRaw
       .map((r) => r as any)
       .filter((r) => r && typeof r === "object")
@@ -258,22 +236,30 @@ export async function getRecommendationsAndTag(
         type: (r.type === "book" ? "book" : "movie") as "movie" | "book",
         reason: String(r.reason ?? "").trim(),
         matchScore: Number(r.matchScore ?? 0),
-        posterUrl: undefined,
+        posterUrl: null,
         author:
           r.author === null || typeof r.author === "undefined"
             ? undefined
             : String(r.author),
       }))
       .filter((r) => r.title && Number.isFinite(r.year) && r.year > 0 && r.reason);
+    recommendations.forEach((r) => {
+      r.posterUrl = null;
+    });
+
+    const movies = recommendations.filter((r) => r.type === "movie").slice(0, 6);
+    const books = recommendations.filter((r) => r.type === "book").slice(0, 4);
+    const normalized = [...movies, ...books];
+    console.log(`[gemini] normalized: ${movies.length} movies, ${books.length} books`);
 
     const watchedSlugsSet = new Set(
       films.map((f) => f.title.toLowerCase().trim()),
     );
-    const filteredRecommendations = recommendations.filter(
+    const filteredRecommendations = normalized.filter(
       (rec) =>
         rec.type === "book" || !watchedSlugsSet.has(rec.title.toLowerCase().trim()),
     );
-    const filteredOutCount = recommendations.length - filteredRecommendations.length;
+    const filteredOutCount = normalized.length - filteredRecommendations.length;
     console.log(
       `[gemini] filtered out ${filteredOutCount} already-watched recommendations`,
     );
