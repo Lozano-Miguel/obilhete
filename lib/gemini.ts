@@ -252,12 +252,24 @@ export async function getRecommendationsAndTag(
     const normalized = [...movies, ...books];
     console.log(`[gemini] normalized: ${movies.length} movies, ${books.length} books`);
 
-    const watchedSlugsSet = new Set(
-      films.map((f) => f.title.toLowerCase().trim()),
+    const watchedTitlesNormalized = new Set(
+      films.map((f) =>
+        f.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "")
+          .replace(/^(the|a|an)/, "")
+          .trim(),
+      ),
     );
+    function normalizeTitle(title: string): string {
+      return title
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "")
+        .replace(/^(the|a|an)/, "")
+        .trim();
+    }
     const filteredRecommendations = normalized.filter(
-      (rec) =>
-        rec.type === "book" || !watchedSlugsSet.has(rec.title.toLowerCase().trim()),
+      (rec) => rec.type === "book" || !watchedTitlesNormalized.has(normalizeTitle(rec.title)),
     );
     const filteredOutCount = normalized.length - filteredRecommendations.length;
     console.log(
