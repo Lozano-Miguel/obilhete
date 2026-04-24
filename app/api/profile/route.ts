@@ -93,41 +93,61 @@ export async function POST(req: Request) {
     console.log(`[profile] getting recommendations/tag for @${username}`);
     const { recommendations: rawRecommendations, personalityTag } =
       await getRecommendationsAndTag(statsBase, enrichedFilms);
-    const recommendations = await enrichRecommendationsWithPosters(rawRecommendations);
+    console.log("[pipeline] gemini done, enriching posters...");
     const fullStats: ProfileStats = {
       ...stats,
       personalityTag,
     };
-    const directorPhotos: Record<string, string | null> = {};
-    const topFiveDirectors = fullStats.topDirectors.slice(0, 5);
-    for (let i = 0; i < topFiveDirectors.length; i++) {
-      const director = topFiveDirectors[i];
-      directorPhotos[director] = await getDirectorPhoto(director);
-      if (i < topFiveDirectors.length - 1) await sleep(200);
+    try {
+      const recommendations = await enrichRecommendationsWithPosters(rawRecommendations);
+      console.log("[pipeline] posters done, fetching director photos...");
+
+      const directorPhotos: Record<string, string | null> = {};
+      const topFiveDirectors = fullStats.topDirectors.slice(0, 5);
+      for (let i = 0; i < topFiveDirectors.length; i++) {
+        const director = topFiveDirectors[i];
+        directorPhotos[director] = await getDirectorPhoto(director);
+        if (i < topFiveDirectors.length - 1) await sleep(200);
+      }
+      console.log("[pipeline] director photos done, upserting...");
+
+      const data: CachedProfile = {
+        username,
+        lastFetchedAt: new Date().toISOString(),
+        profile,
+        films: enrichedFilms,
+        stats: fullStats,
+        recommendations,
+        directorPhotos,
+      };
+
+      const shouldUpsert =
+        enrichedFilms.length > 0 &&
+        fullStats.totalFilms > 0 &&
+        recommendations.length > 0;
+
+      if (shouldUpsert) {
+        await upsertCachedProfile(data);
+        console.log("[pipeline] upsert done, returning response...");
+      } else {
+        console.log("[cache] skipping upsert — incomplete data");
+        console.log("[pipeline] upsert done, returning response...");
+      }
+
+      return NextResponse.json({ ...data, cached: false }, { status: 200 });
+    } catch (err) {
+      console.error("[pipeline] post-gemini crash:", err);
+      return NextResponse.json(
+        {
+          profile,
+          stats: fullStats,
+          recommendations: rawRecommendations,
+          directorPhotos: {},
+          cached: false,
+        },
+        { status: 200 },
+      );
     }
-
-    const data: CachedProfile = {
-      username,
-      lastFetchedAt: new Date().toISOString(),
-      profile,
-      films: enrichedFilms,
-      stats: fullStats,
-      recommendations,
-      directorPhotos,
-    };
-
-    const shouldUpsert =
-      enrichedFilms.length > 0 &&
-      fullStats.totalFilms > 0 &&
-      recommendations.length > 0;
-
-    if (shouldUpsert) {
-      await upsertCachedProfile(data);
-    } else {
-      console.log("[cache] skipping upsert — incomplete data");
-    }
-
-    return NextResponse.json({ ...data, cached: false }, { status: 200 });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     if (message === "Profile not found") {
