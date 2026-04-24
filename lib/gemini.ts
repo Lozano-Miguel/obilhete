@@ -236,7 +236,7 @@ export async function getRecommendationsAndTag(
         type: (r.type === "book" ? "book" : "movie") as "movie" | "book",
         reason: String(r.reason ?? "").trim(),
         matchScore: Number(r.matchScore ?? 0),
-        posterUrl: null,
+        posterUrl: undefined,
         author:
           r.author === null || typeof r.author === "undefined"
             ? undefined
@@ -244,7 +244,7 @@ export async function getRecommendationsAndTag(
       }))
       .filter((r) => r.title && Number.isFinite(r.year) && r.year > 0 && r.reason);
     recommendations.forEach((r) => {
-      r.posterUrl = null;
+      r.posterUrl = undefined;
     });
 
     const movies = recommendations.filter((r) => r.type === "movie").slice(0, 6);
