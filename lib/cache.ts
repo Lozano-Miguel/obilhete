@@ -7,11 +7,11 @@ type CachedProfilesRow = {
   id: string;
   username: string;
   last_fetched_at: string;
-  profile: CachedProfile["profile"];
-  films?: CachedProfile["films"];
-  stats: CachedProfile["stats"];
-  recommendations: CachedProfile["recommendations"];
-  director_photos?: CachedProfile["directorPhotos"];
+  profile: CachedProfile["profile"] | string | null;
+  films?: CachedProfile["films"] | string | null;
+  stats: CachedProfile["stats"] | string | null;
+  recommendations?: CachedProfile["recommendations"] | string | null;
+  director_photos?: CachedProfile["directorPhotos"] | string | null;
   created_at: string;
 };
 
@@ -20,6 +20,15 @@ function isStale(lastFetchedAtIso: string) {
   if (!Number.isFinite(last)) return true;
   const ageMs = Date.now() - last;
   return ageMs > CACHE_TTL_HOURS * 60 * 60 * 1000;
+}
+
+function safeParseJson<T>(value: unknown, fallback: T): T {
+  if (typeof value !== "string") return (value as T) ?? fallback;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
 }
 
 export async function getCachedProfile(
@@ -37,16 +46,22 @@ export async function getCachedProfile(
 
     const row = data as unknown as CachedProfilesRow;
     if (isStale(row.last_fetched_at)) return null;
+    const profile = safeParseJson<CachedProfile["profile"] | null>(
+      row.profile,
+      null,
+    );
+    const stats = safeParseJson<CachedProfile["stats"] | null>(row.stats, null);
+    if (!profile || !stats) return null;
 
     return {
       id: row.id,
       username: row.username,
       lastFetchedAt: row.last_fetched_at,
-      profile: row.profile,
-      films: row.films ?? [],
-      stats: row.stats,
-      recommendations: row.recommendations ?? [],
-      directorPhotos: row.director_photos ?? {},
+      profile,
+      films: safeParseJson(row.films, []),
+      stats,
+      recommendations: safeParseJson(row.recommendations, []),
+      directorPhotos: safeParseJson(row.director_photos, {}),
     };
   } catch (err) {
     console.log("[cache] getCachedProfile exception", {
