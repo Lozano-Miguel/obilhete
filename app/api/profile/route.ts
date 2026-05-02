@@ -93,7 +93,7 @@ export async function POST(req: Request) {
     console.log(`[profile] getting recommendations/tag for @${username}`);
     const { recommendations: rawRecommendations, personalityTag } =
       await getRecommendationsAndTag(statsBase, enrichedFilms);
-    console.log("[pipeline] gemini done, enriching posters...");
+    console.log("[pipeline] groq done, enriching posters...");
     const fullStats: ProfileStats = {
       ...stats,
       personalityTag,
@@ -136,7 +136,7 @@ export async function POST(req: Request) {
 
       return NextResponse.json({ ...data, cached: false }, { status: 200 });
     } catch (err) {
-      console.error("[pipeline] post-gemini crash:", err);
+      console.error("[pipeline] post-groq crash:", err);
       return NextResponse.json(
         {
           profile,
