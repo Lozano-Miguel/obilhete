@@ -14,7 +14,7 @@ breakdown of genres, decades, countries and ratings, a one-line "vibe" tag, and
 - **AI:** Groq (`groq-sdk`) — recommendations + personality tag
 - **Film metadata:** TMDB API (native `fetch`)
 - **Scraping:** a **separate, private** Python (FastAPI) service — see below
-- **Deployment:** self-hosted behind a reverse proxy
+- **Deployment:** self-hosted behind a reverse proxy (see [docs/DEPLOY.md](./docs/DEPLOY.md))
 
 > There is no ScraperAPI, no Supabase, no axios/cheerio and no Vercel `@vercel/og` here —
 > earlier iterations used those; this README reflects the current code.
