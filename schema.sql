@@ -1,4 +1,4 @@
-/*
+-- Postgres schema for the cached_profiles table used by lib/cache.ts and lib/db.ts.
 CREATE TABLE cached_profiles (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
@@ -11,9 +11,3 @@ CREATE TABLE cached_profiles (
 );
 
 CREATE INDEX idx_cached_profiles_username ON cached_profiles(username);
-*/
-
-import sql from "@/lib/db";
-
-export const supabase = sql;
-
