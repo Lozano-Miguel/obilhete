@@ -3,7 +3,7 @@ import type { FilmEntry, LetterboxdProfile } from "@/types";
 const SCRAPER_URL = process.env.SCRAPER_SERVICE_URL ?? "http://localhost:8001";
 
 export async function scrapeProfile(username: string): Promise<LetterboxdProfile> {
-  const res = await fetch(`${SCRAPER_URL}/profile/${username}`, {
+  const res = await fetch(`${SCRAPER_URL}/profile/${encodeURIComponent(username)}`, {
     signal: AbortSignal.timeout(30000),
   });
   if (res.status === 404) throw new Error("Profile not found");
@@ -18,7 +18,7 @@ export async function scrapeProfile(username: string): Promise<LetterboxdProfile
 }
 
 export async function scrapeFilms(username: string): Promise<FilmEntry[]> {
-  const res = await fetch(`${SCRAPER_URL}/films/${username}`, {
+  const res = await fetch(`${SCRAPER_URL}/films/${encodeURIComponent(username)}`, {
     signal: AbortSignal.timeout(180000),
   });
   if (!res.ok) throw new Error(`Scraper error: ${res.status}`);
@@ -33,7 +33,7 @@ export async function scrapeFilms(username: string): Promise<FilmEntry[]> {
 }
 
 export async function scrapeRatings(username: string): Promise<Map<string, number>> {
-  const res = await fetch(`${SCRAPER_URL}/rss/${username}`, {
+  const res = await fetch(`${SCRAPER_URL}/rss/${encodeURIComponent(username)}`, {
     signal: AbortSignal.timeout(30000),
   });
   if (!res.ok) return new Map();
