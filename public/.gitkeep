@@ -1,0 +1,1 @@
+# Static assets served at the site root. Kept so the standalone Docker build has a public/ to copy.
