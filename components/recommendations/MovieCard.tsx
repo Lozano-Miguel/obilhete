@@ -31,13 +31,6 @@ function matchPercent(score: number): number {
   return Math.round(Math.min(100, Math.max(0, score)));
 }
 
-function letterboxdFilmSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 function FilmIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -68,7 +61,7 @@ type MovieCardProps = {
 export function MovieCard({ item, variants = recommendationCardVariants }: MovieCardProps) {
   const poster = resolvePosterUrl(item.posterUrl);
   const pct = matchPercent(item.matchScore);
-  const lbHref = `https://letterboxd.com/film/${letterboxdFilmSlug(item.title)}/`;
+  const lbHref = `https://letterboxd.com/search/films/${encodeURIComponent(item.title)}/`;
 
   return (
     <MotionA
