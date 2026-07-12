@@ -4,24 +4,7 @@ import type {
   GenreStat,
   FilmEntry,
   ProfileStats,
-  RatingBucket,
 } from "@/types";
-
-export function topN<T>(
-  items: T[],
-  n: number,
-  getValue: (item: T) => number,
-): T[] {
-  return [...items].sort((a, b) => getValue(b) - getValue(a)).slice(0, n);
-}
-
-export function normalizePercentages(
-  stats: { value: number }[],
-): { value: number }[] {
-  const total = stats.reduce((s, x) => s + x.value, 0);
-  if (!total) return stats.map((x) => ({ ...x, value: 0 }));
-  return stats.map((x) => ({ ...x, value: Math.round((x.value / total) * 1000) / 10 }));
-}
 
 export function toGenreStats(input: Record<string, number>): GenreStat[] {
   return Object.entries(input).map(([name, value]) => ({ name, value }));
@@ -36,10 +19,6 @@ export function toCountryCounts(input: Record<string, number>): CountryCount[] {
     countryCode,
     value,
   }));
-}
-
-export function toRatingBuckets(input: Record<string, number>): RatingBucket[] {
-  return Object.entries(input).map(([rating, value]) => ({ rating, value }));
 }
 
 function sortRecordDesc(input: Record<string, number>): Record<string, number> {
