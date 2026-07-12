@@ -10,6 +10,16 @@ const GROQ_MODELS = [
   'llama-3.1-8b-instant',
 ]
 
+// Normalize a title for watched-list matching: strip a leading article as a
+// whole word (before squashing), then remove all non-alphanumerics. Stripping
+// the article after squashing would eat real letters ("Avatar" -> "vatar").
+export function normalizeTitle(t: string): string {
+  return t
+    .toLowerCase()
+    .replace(/^(the|a|an)\s+/i, '')
+    .replace(/[^a-z0-9]/g, '')
+}
+
 export async function getRecommendationsAndTag(
   stats: Omit<ProfileStats, 'personalityTag'>,
   films: FilmEntry[]
@@ -109,17 +119,7 @@ Return exactly this JSON structure:
         console.log(`[groq] success: ${movies.length} movies, ${books.length} books`)
 
         // Filter already watched
-        const watchedSet = new Set(
-          films.map(f => f.title.toLowerCase()
-            .replace(/[^a-z0-9]/g, '')
-            .replace(/^(the|a|an)/, '').trim()
-          )
-        )
-        function normalizeTitle(t: string) {
-          return t.toLowerCase()
-            .replace(/[^a-z0-9]/g, '')
-            .replace(/^(the|a|an)/, '').trim()
-        }
+        const watchedSet = new Set(films.map(f => normalizeTitle(f.title)))
         const filtered = normalized.filter(r =>
           r.type === 'book' || !watchedSet.has(normalizeTitle(r.title))
         )
