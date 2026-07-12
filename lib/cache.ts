@@ -64,9 +64,7 @@ export async function getCachedProfile(
       directorPhotos: safeParseJson(row.director_photos, {}),
     };
   } catch (err) {
-    console.log("[cache] getCachedProfile exception", {
-      message: err instanceof Error ? err.message : String(err),
-    });
+    console.error("[cache] getCachedProfile failed", err);
     return null;
   }
 }
@@ -113,9 +111,10 @@ export async function upsertCachedProfile(data: CachedProfile): Promise<void> {
         director_photos = EXCLUDED.director_photos
     `;
   } catch (err) {
-    console.log("[cache] upsertCachedProfile exception", {
-      message: err instanceof Error ? err.message : String(err),
-    });
+    // Surface the failure instead of silently no-oping, so a DB outage is
+    // visible rather than looking like a permanent cache miss.
+    console.error("[cache] upsertCachedProfile failed", err);
+    throw err;
   }
 }
 
@@ -127,9 +126,7 @@ export async function getTotalProfilesCount(): Promise<number> {
     `;
     return rows[0]?.count ?? 0;
   } catch (err) {
-    console.log("[cache] getTotalProfilesCount exception", {
-      message: err instanceof Error ? err.message : String(err),
-    });
+    console.error("[cache] getTotalProfilesCount failed", err);
     return 0;
   }
 }
