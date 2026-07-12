@@ -12,6 +12,7 @@ import {
   getRecommendationsAndTag,
 } from "@/lib/gemini";
 import { getCachedProfile, upsertCachedProfile } from "@/lib/cache";
+import { isValidLetterboxdUsername } from "@/lib/validation";
 import type { CachedProfile, ProfileStats } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -57,6 +58,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid username" }, { status: 400 });
   }
   const username = rawUsername.toLowerCase().trim();
+  if (!isValidLetterboxdUsername(username)) {
+    return NextResponse.json({ error: "Invalid username" }, { status: 400 });
+  }
 
   const cached = await getCachedProfile(username);
   if (cached) {

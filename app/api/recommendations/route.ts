@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getRecommendationsAndTag } from "@/lib/gemini";
 import sql from "@/lib/db";
+import { isValidLetterboxdUsername } from "@/lib/validation";
 import type { FilmEntry, ProfileStats, Recommendation } from "@/types";
 
 export async function GET(req: Request) {
@@ -54,6 +55,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid username" }, { status: 400 });
   }
   const username = rawUsername.toLowerCase().trim();
+  if (!isValidLetterboxdUsername(username)) {
+    return NextResponse.json({ error: "Invalid username" }, { status: 400 });
+  }
 
   let data: { username: string; stats: ProfileStats; films: FilmEntry[] | null } | null =
     null;
