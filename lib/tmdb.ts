@@ -1,15 +1,7 @@
-import axios from "axios";
 import type { FilmEntry } from "@/types";
 
+const TMDB_API_BASE = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
-const tmdbClient = axios.create({
-  baseURL: "https://api.themoviedb.org/3",
-  headers: {
-    Authorization: `Bearer ${process.env.TMDB_API_KEY}`,
-    "Content-Type": "application/json",
-  },
-  timeout: 10000,
-});
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -29,11 +21,24 @@ async function tmdbGet<T>(
 ): Promise<T | null> {
   if (!hasKey()) return null;
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const url = new URL(`${TMDB_API_BASE}${normalizedPath}`);
+  if (params) {
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined && value !== null) {
+        url.searchParams.set(key, String(value));
+      }
+    }
+  }
   try {
-    const res = await tmdbClient.get<T>(normalizedPath, {
-      params,
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${process.env.TMDB_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      signal: AbortSignal.timeout(10000),
     });
-    return res.data;
+    if (!res.ok) throw new Error(`TMDB error: ${res.status}`);
+    return (await res.json()) as T;
   } catch (err) {
     console.log("[tmdb] request failed", {
       path,
@@ -119,17 +124,13 @@ export async function getFilmDetails(
 }
 
 export async function getDirectorPhoto(name: string): Promise<string | null> {
-  try {
-    const res = await tmdbClient.get("/search/person", {
-      params: { query: name, limit: 1 },
-    });
-    const person = (res.data as { results?: Array<{ profile_path?: string | null }> })
-      .results?.[0];
-    if (!person || !person.profile_path) return null;
-    return `https://image.tmdb.org/t/p/w185${person.profile_path}`;
-  } catch {
-    return null;
-  }
+  const data = await tmdbGet<{ results?: Array<{ profile_path?: string | null }> }>(
+    "/search/person",
+    { query: name, limit: 1 },
+  );
+  const person = data?.results?.[0];
+  if (!person || !person.profile_path) return null;
+  return `https://image.tmdb.org/t/p/w185${person.profile_path}`;
 }
 
 export async function enrichFilms(films: FilmEntry[]): Promise<FilmEntry[]> {
