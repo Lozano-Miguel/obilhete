@@ -10,7 +10,7 @@ import { buildProfileStats } from "@/utils/transform";
 import {
   enrichRecommendationsWithPosters,
   getRecommendationsAndTag,
-} from "@/lib/gemini";
+} from "@/lib/groq";
 import { getCachedProfile, upsertCachedProfile } from "@/lib/cache";
 import { isValidLetterboxdUsername } from "@/lib/validation";
 import type { CachedProfile, ProfileStats } from "@/types";

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRecommendationsAndTag } from "@/lib/gemini";
+import { getRecommendationsAndTag } from "@/lib/groq";
 import sql from "@/lib/db";
 import { isValidLetterboxdUsername } from "@/lib/validation";
 import type { FilmEntry, ProfileStats } from "@/types";
