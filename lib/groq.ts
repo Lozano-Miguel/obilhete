@@ -200,6 +200,7 @@ export async function enrichRecommendationsWithPosters(
       });
       const response = await fetch(
         `https://openlibrary.org/search.json?${params.toString()}`,
+        { signal: AbortSignal.timeout(10000) },
       );
 
       if (response.ok) {
