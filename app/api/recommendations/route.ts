@@ -72,8 +72,8 @@ export async function POST(req: Request) {
     `;
     data = rows[0] ?? null;
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[recommendations] read failed", error);
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 
   if (!data) {
@@ -96,8 +96,8 @@ export async function POST(req: Request) {
       WHERE username = ${username}
     `;
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[recommendations] update failed", error);
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 
   return NextResponse.json({ recommendations }, { status: 200 });

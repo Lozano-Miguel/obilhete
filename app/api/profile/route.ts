@@ -157,7 +157,7 @@ export async function POST(req: Request) {
     if (message === "Profile not found") {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
-    console.log("[profile] pipeline failed", { message });
+    console.error("[profile] pipeline failed", { message });
     return NextResponse.json(
       { error: "Failed to build profile" },
       { status: 500 },
