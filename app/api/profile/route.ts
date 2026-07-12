@@ -22,29 +22,6 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const username = (searchParams.get("username") || "").trim();
-  if (!username) {
-    return NextResponse.json(
-      { error: "Missing username" },
-      { status: 400 },
-    );
-  }
-
-  let profile: Awaited<ReturnType<typeof scrapeProfile>> | null = null;
-  try {
-    profile = await scrapeProfile(username);
-  } catch {
-    // ignore: letterboxd might rate-limit or block
-  }
-
-  return NextResponse.json({
-    username,
-    profile,
-  });
-}
-
 export async function POST(req: Request) {
   let body: unknown;
   try {
