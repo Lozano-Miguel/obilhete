@@ -42,8 +42,8 @@ job queue isn't warranted):
 
 1. **Cache check** — look up `cached_profiles` in Postgres; serve instantly if the entry
    is within the 24h TTL.
-2. **Scrape** — call the scraper for profile details, the paginated films list, and RSS
-   ratings; merge ratings into the films.
+2. **Scrape** — call the scraper for profile details and the paginated films list
+   (ratings included per film).
 3. **Enrich** — hit TMDB per film for genres, country, language, director, cast and
    poster URL.
 4. **Compute stats** — aggregate genres, decades, countries, languages, rating

@@ -31,28 +31,3 @@ export async function scrapeFilms(username: string): Promise<FilmEntry[]> {
     userRating: f.userRating ?? null,
   }));
 }
-
-export async function scrapeRatings(username: string): Promise<Map<string, number>> {
-  const res = await fetch(`${SCRAPER_URL}/rss/${encodeURIComponent(username)}`, {
-    signal: AbortSignal.timeout(30000),
-  });
-  if (!res.ok) return new Map();
-  const data = await res.json();
-  const map = new Map<string, number>();
-  for (const item of data.items) {
-    if (item.slug && item.rating !== null) {
-      map.set(item.slug, item.rating);
-    }
-  }
-  return map;
-}
-
-export function mergeRatings(
-  films: FilmEntry[],
-  ratings: Map<string, number>,
-): FilmEntry[] {
-  return films.map((f) => ({
-    ...f,
-    userRating: f.userRating ?? ratings.get(f.slug) ?? null,
-  }));
-}

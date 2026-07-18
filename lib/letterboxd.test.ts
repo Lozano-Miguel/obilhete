@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { scrapeFilms, scrapeProfile, scrapeRatings } from "@/lib/letterboxd";
+import { scrapeFilms, scrapeProfile } from "@/lib/letterboxd";
 
 function mockFetchCapture() {
   const calls: string[] = [];
@@ -38,11 +38,5 @@ describe("scraper URL encoding", () => {
     const calls = mockFetchCapture();
     await scrapeFilms("a/b");
     expect(calls[0]).toContain("/films/a%2Fb");
-  });
-
-  it("encodes the username in the rss URL", async () => {
-    const calls = mockFetchCapture();
-    await scrapeRatings("a/b");
-    expect(calls[0]).toContain("/rss/a%2Fb");
   });
 });

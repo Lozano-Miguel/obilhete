@@ -1,10 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  mergeRatings,
-  scrapeFilms,
-  scrapeProfile,
-  scrapeRatings,
-} from "@/lib/letterboxd";
+import { scrapeFilms, scrapeProfile } from "@/lib/letterboxd";
 import { enrichFilms, getDirectorPhoto } from "@/lib/tmdb";
 import { buildProfileStats } from "@/utils/transform";
 import {
@@ -53,13 +48,8 @@ export async function POST(req: Request) {
     const films = await scrapeFilms(username);
     console.log("[pipeline] scraped films count:", films.length);
 
-    console.log(`[profile] scraping rss ratings for @${username}`);
-    const ratings = await scrapeRatings(username);
-    const mergedFilms = mergeRatings(films, ratings);
-    console.log("[pipeline] after merge ratings count:", mergedFilms.length);
-
     console.log(`[profile] enriching with tmdb for @${username}`);
-    const enrichedFilms = await enrichFilms(mergedFilms);
+    const enrichedFilms = await enrichFilms(films);
     console.log("[pipeline] after enrichment count:", enrichedFilms.length);
     console.log(
       "[pipeline] first enriched film sample:",
