@@ -43,7 +43,7 @@ export function Hero({ totalProfiles }: HeroProps) {
   return (
     <section className="hero-film-grain relative flex min-h-[100dvh] flex-col bg-[#0a0a0a] text-[#ffffff]">
       <motion.div
-        className="absolute left-6 right-6 top-8 z-10 flex items-center justify-between md:left-10 md:right-10 md:top-10"
+        className="absolute left-6 right-6 top-8 z-20 flex items-center justify-between md:left-10 md:right-10 md:top-10"
         initial={fadeUp.initial}
         animate={fadeUp.animate}
         transition={staggerDelay(0)}
@@ -65,9 +65,9 @@ export function Hero({ totalProfiles }: HeroProps) {
           transition={staggerDelay(1)}
         >
           <h1 className="text-balance font-semibold leading-[0.95] tracking-tight">
-            <span className="block text-[clamp(3rem,12vw,6rem)]">Conhece</span>
+            <span className="block text-[clamp(3rem,12vw,6rem)]">Descobre</span>
             <span className="mt-1 block text-[clamp(2.25rem,9vw,4.5rem)] font-medium">
-              o teu gosto.
+              o que ver a seguir.
             </span>
           </h1>
         </motion.div>
@@ -79,7 +79,7 @@ export function Hero({ totalProfiles }: HeroProps) {
           transition={staggerDelay(2)}
         >
           Introduz o teu perfil do Letterboxd. Vemos o que os teus filmes dizem
-          sobre ti e dizemos-te o que ver a seguir.
+          sobre ti e recomendamos filmes à tua medida.
         </motion.p>
 
         <motion.form

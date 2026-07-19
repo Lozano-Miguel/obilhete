@@ -8,7 +8,7 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "O Bilhete — Conhece o Teu Gosto",
+  title: "O Bilhete — Descobre o que ver a seguir",
   description:
     "Descobre a tua personalidade cinéfila e recebe recomendações com base no teu perfil Letterboxd.",
 };
