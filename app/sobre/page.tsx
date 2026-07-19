@@ -51,23 +51,20 @@ export default function SobrePage() {
         </section>
 
         <section className="mt-10 space-y-4 text-[15px] leading-relaxed text-[#bbbbbb]">
-          <h2 className="text-lg font-semibold text-[#ffffff]">
-            E os meus dados?
-          </h2>
+          <h2 className="text-lg font-semibold text-[#ffffff]">Open source</h2>
           <p>
-            Usamos apenas informação pública do teu perfil. Guardamos o
-            resultado da análise em cache para a página carregar mais depressa
-            da próxima vez — nada mais. Não há contas, não há tracking, não há
-            venda de dados.
+            O Bilhete é um projeto de código-aberto (open source). O
+            código-fonte está disponível no GitHub, aberto a contribuições,
+            feedback e sugestões da comunidade.
           </p>
-        </section>
-
-        <section className="mt-10 space-y-4 text-[15px] leading-relaxed text-[#bbbbbb]">
-          <h2 className="text-lg font-semibold text-[#ffffff]">Quem fez isto?</h2>
-          <p>
-            O Bilhete é um projeto pessoal de Miguel Lozano, feito em Portugal.
-            Não tem qualquer afiliação com o Letterboxd, o TMDB ou o Groq.
-          </p>
+          <a
+            href="https://github.com/Lozano-Miguel/obilhete"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] px-5 py-2.5 text-sm font-medium text-[#ffffff] transition-colors hover:border-[#e8c547] hover:text-[#e8c547]"
+          >
+            Ver repositório no GitHub →
+          </a>
         </section>
       </main>
 
