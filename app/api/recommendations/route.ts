@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getRecommendationsAndTag } from "@/lib/groq";
-import sql from "@/lib/db";
+import sql, { jsonb } from "@/lib/db";
 import { isValidLetterboxdUsername } from "@/lib/validation";
 import type { FilmEntry, ProfileStats } from "@/types";
 
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
   try {
     await sql`
       UPDATE cached_profiles
-      SET recommendations = ${JSON.stringify(recommendations)}::jsonb
+      SET recommendations = ${jsonb(recommendations)}
       WHERE username = ${username}
     `;
   } catch (error) {

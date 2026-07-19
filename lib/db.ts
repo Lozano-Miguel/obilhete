@@ -9,4 +9,8 @@ if (!connectionString) {
 
 const sql = postgres(connectionString);
 
+// postgres.js's JSONValue type rejects typed interfaces without index
+// signatures, even though they serialize fine — cast once here.
+export const jsonb = (value: unknown) => sql.json(value as postgres.JSONValue);
+
 export default sql;

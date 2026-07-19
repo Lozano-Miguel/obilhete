@@ -1,4 +1,4 @@
-import sql from "@/lib/db";
+import sql, { jsonb } from "@/lib/db";
 import type { CachedProfile } from "@/types";
 
 const CACHE_TTL_HOURS = 24;
@@ -96,11 +96,11 @@ export async function upsertCachedProfile(data: CachedProfile): Promise<void> {
         COALESCE(${profileId}::uuid, gen_random_uuid()),
         ${payload.username},
         ${payload.last_fetched_at},
-        ${JSON.stringify(payload.profile)}::jsonb,
-        ${JSON.stringify(payload.films)}::jsonb,
-        ${JSON.stringify(payload.stats)}::jsonb,
-        ${JSON.stringify(payload.recommendations)}::jsonb,
-        ${JSON.stringify(payload.director_photos)}::jsonb
+        ${jsonb(payload.profile)},
+        ${jsonb(payload.films)},
+        ${jsonb(payload.stats)},
+        ${jsonb(payload.recommendations)},
+        ${jsonb(payload.director_photos)}
       )
       ON CONFLICT (username) DO UPDATE SET
         last_fetched_at = EXCLUDED.last_fetched_at,
