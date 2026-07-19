@@ -1,5 +1,4 @@
 import { Hero } from "@/components/landing/Hero";
-import { HowItWorks } from "@/components/landing/HowItWorks";
 import { SiteFooter } from "@/components/SiteFooter";
 import { getTotalProfilesCount } from "@/lib/cache";
 
@@ -11,7 +10,6 @@ export default async function Home() {
   return (
     <>
       <Hero totalProfiles={totalProfiles} />
-      <HowItWorks />
       <SiteFooter />
     </>
   );

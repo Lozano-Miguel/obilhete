@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 import { Logo } from "@/components/Logo";
+import { ProfilePreview } from "@/components/landing/ProfilePreview";
 
 function parseUsername(input: string): string {
   const cleaned = input.trim();
@@ -111,6 +112,15 @@ export function Hero({ totalProfiles }: HeroProps) {
             </button>
           </div>
         </motion.form>
+
+        <motion.div
+          className="mt-14 flex w-full justify-center"
+          initial={fadeUp.initial}
+          animate={fadeUp.animate}
+          transition={staggerDelay(4)}
+        >
+          <ProfilePreview />
+        </motion.div>
       </div>
 
       {totalProfiles >= 10 ? (
@@ -118,7 +128,7 @@ export function Hero({ totalProfiles }: HeroProps) {
           className="relative z-10 px-6 pb-10 text-center text-xs text-[#888888] md:px-10"
           initial={fadeUp.initial}
           animate={fadeUp.animate}
-          transition={staggerDelay(4)}
+          transition={staggerDelay(5)}
         >
           {countLabel} perfis analisados
         </motion.p>
