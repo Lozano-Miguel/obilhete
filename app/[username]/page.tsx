@@ -3,7 +3,7 @@ import { ProfilePageClient } from "@/components/profile/ProfilePageClient";
 import { getCachedProfile } from "@/lib/cache";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_BASE_URL ?? "https://obilhete.vercel.app";
+  process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
 
 export async function generateMetadata({
   params,
