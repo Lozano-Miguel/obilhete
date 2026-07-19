@@ -1,15 +1,21 @@
 const steps = [
   {
     n: "01",
-    title: "Introduz o username",
+    title: "Introduz o teu perfil",
+    description:
+      "Cola o link do teu perfil do Letterboxd ou escreve o nome de utilizador.",
   },
   {
     n: "02",
-    title: "Analisamos o teu perfil",
+    title: "Analisamos os teus filmes",
+    description:
+      "Lemos os filmes que viste: realizadores, géneros, décadas e países.",
   },
   {
     n: "03",
     title: "Descobre o teu gosto",
+    description:
+      "Recebes o teu retrato cinéfilo e sugestões do que ver a seguir.",
   },
 ] as const;
 
@@ -47,6 +53,9 @@ export function HowItWorks() {
                     {step.title}
                   </h2>
                 </div>
+                <p className="mt-2 max-w-[16rem] text-sm leading-relaxed text-[#888888]">
+                  {step.description}
+                </p>
               </div>
             </div>
           ))}

@@ -1,8 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+
+import { Logo } from "@/components/Logo";
 
 function parseUsername(input: string): string {
   const cleaned = input.trim();
@@ -40,17 +43,18 @@ export function Hero({ totalProfiles }: HeroProps) {
   return (
     <section className="hero-film-grain relative flex min-h-[100dvh] flex-col bg-[#0a0a0a] text-[#ffffff]">
       <motion.div
-        className="absolute left-6 top-8 z-10 md:left-10 md:top-10"
+        className="absolute left-6 right-6 top-8 z-10 flex items-center justify-between md:left-10 md:right-10 md:top-10"
         initial={fadeUp.initial}
         animate={fadeUp.animate}
         transition={staggerDelay(0)}
       >
-        <span
-          className="inline-block text-sm font-medium tracking-[0.2em] text-[#e8c547]"
-          style={{ fontVariant: "small-caps" }}
+        <Logo />
+        <Link
+          href="/sobre"
+          className="text-sm text-[#888888] transition-colors hover:text-[#ffffff]"
         >
-          O Bilhete
-        </span>
+          Sobre
+        </Link>
       </motion.div>
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 pb-28 pt-20 md:px-10 md:pb-32">
@@ -74,8 +78,8 @@ export function Hero({ totalProfiles }: HeroProps) {
           animate={fadeUp.animate}
           transition={staggerDelay(2)}
         >
-          Introduz o teu username do Letterboxd. Vemos o que os teus filmes dizem sobre
-          ti — e recomendamos o que veres a seguir.
+          Introduz o teu perfil do Letterboxd. Vemos o que os teus filmes dizem
+          sobre ti e dizemos-te o que ver a seguir.
         </motion.p>
 
         <motion.form
@@ -87,14 +91,14 @@ export function Hero({ totalProfiles }: HeroProps) {
         >
           <div className="flex w-full max-w-md flex-col gap-2 md:flex-row">
             <label htmlFor="letterboxd-username" className="sr-only">
-              Username ou link do Letterboxd
+              Nome de utilizador ou link do Letterboxd
             </label>
             <input
               id="letterboxd-username"
               name="username"
               type="text"
               autoComplete="username"
-              placeholder="username ou link do Letterboxd"
+              placeholder="nome de utilizador ou link do Letterboxd"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="min-h-[48px] w-full rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#111111] px-5 py-3 text-[15px] text-[#ffffff] outline-none placeholder:text-[#888888] shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset] md:flex-1 md:rounded-full"
@@ -109,14 +113,16 @@ export function Hero({ totalProfiles }: HeroProps) {
         </motion.form>
       </div>
 
-      <motion.p
-        className="relative z-10 px-6 pb-10 text-center text-xs text-[#888888] md:px-10"
-        initial={fadeUp.initial}
-        animate={fadeUp.animate}
-        transition={staggerDelay(4)}
-      >
-        {countLabel} perfis analisados
-      </motion.p>
+      {totalProfiles >= 10 ? (
+        <motion.p
+          className="relative z-10 px-6 pb-10 text-center text-xs text-[#888888] md:px-10"
+          initial={fadeUp.initial}
+          animate={fadeUp.animate}
+          transition={staggerDelay(4)}
+        >
+          {countLabel} perfis analisados
+        </motion.p>
+      ) : null}
     </section>
   );
 }
