@@ -6,7 +6,7 @@ import type { Recommendation } from "@/types";
 
 import { recommendationCardVariants } from "./MovieCard";
 
-const MotionA = motion("a");
+const MotionA = motion.create("a");
 
 function matchPercent(score: number): number {
   if (!Number.isFinite(score)) return 0;

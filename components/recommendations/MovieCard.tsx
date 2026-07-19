@@ -3,7 +3,7 @@
 import { motion, type Variants } from "framer-motion";
 import type { Recommendation } from "@/types";
 
-const MotionA = motion("a");
+const MotionA = motion.create("a");
 
 const TMDB_POSTER_BASE = "https://image.tmdb.org/t/p/w185";
 
