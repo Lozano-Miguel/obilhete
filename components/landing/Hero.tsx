@@ -1,9 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { CSSProperties, FormEvent, useState } from "react";
 
 import { Logo } from "@/components/Logo";
 import { ProfilePreview } from "@/components/landing/ProfilePreview";
@@ -15,13 +14,8 @@ function parseUsername(input: string): string {
   return cleaned.replace(/\//g, "").toLowerCase();
 }
 
-const fadeUp = {
-  initial: { opacity: 0, y: 28 },
-  animate: { opacity: 1, y: 0 },
-};
-
-function staggerDelay(index: number) {
-  return { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const, delay: index * 0.1 };
+function fadeIndex(index: number): CSSProperties {
+  return { "--fade-index": index } as CSSProperties;
 }
 
 type HeroProps = {
@@ -43,11 +37,9 @@ export function Hero({ totalProfiles }: HeroProps) {
 
   return (
     <section className="hero-film-grain relative flex min-h-[100dvh] flex-col bg-[#0a0a0a] text-[#ffffff]">
-      <motion.div
-        className="absolute left-6 right-6 top-8 z-20 flex items-center justify-between md:left-10 md:right-10 md:top-10"
-        initial={fadeUp.initial}
-        animate={fadeUp.animate}
-        transition={staggerDelay(0)}
+      <div
+        className="fade-up absolute left-6 right-6 top-8 z-20 flex items-center justify-between md:left-10 md:right-10 md:top-10"
+        style={fadeIndex(0)}
       >
         <Logo />
         <Link
@@ -56,14 +48,12 @@ export function Hero({ totalProfiles }: HeroProps) {
         >
           Sobre
         </Link>
-      </motion.div>
+      </div>
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 pb-28 pt-20 md:px-10 md:pb-32">
-        <motion.div
-          className="flex w-full max-w-5xl flex-col items-center text-center"
-          initial={fadeUp.initial}
-          animate={fadeUp.animate}
-          transition={staggerDelay(1)}
+        <div
+          className="fade-up flex w-full max-w-5xl flex-col items-center text-center"
+          style={fadeIndex(1)}
         >
           <h1 className="text-balance font-semibold leading-[0.95] tracking-tight">
             <span className="block text-[clamp(3rem,12vw,6rem)]">Descobre</span>
@@ -71,26 +61,22 @@ export function Hero({ totalProfiles }: HeroProps) {
               o que ver a seguir.
             </span>
           </h1>
-        </motion.div>
+        </div>
 
-        <motion.p
-          className="mx-auto mt-8 max-w-xl text-pretty text-center text-base leading-relaxed text-[#888888] md:text-lg"
-          initial={fadeUp.initial}
-          animate={fadeUp.animate}
-          transition={staggerDelay(2)}
+        <p
+          className="fade-up mx-auto mt-8 max-w-xl text-pretty text-center text-base leading-relaxed text-[#888888] md:text-lg"
+          style={fadeIndex(2)}
         >
           Introduz o teu perfil do Letterboxd. Vemos o que os teus filmes dizem
           sobre ti e recomendamos filmes à tua medida.
-        </motion.p>
+        </p>
 
-        <motion.form
-          className="mt-10 w-full max-w-xl"
+        <form
+          className="fade-up mt-10 w-full max-w-md"
           onSubmit={handleSubmit}
-          initial={fadeUp.initial}
-          animate={fadeUp.animate}
-          transition={staggerDelay(3)}
+          style={fadeIndex(3)}
         >
-          <div className="flex w-full max-w-md flex-col gap-2 md:flex-row">
+          <div className="flex w-full flex-col gap-2 md:flex-row">
             <label htmlFor="letterboxd-username" className="sr-only">
               Nome de utilizador ou link do Letterboxd
             </label>
@@ -111,27 +97,23 @@ export function Hero({ totalProfiles }: HeroProps) {
               Analisar →
             </button>
           </div>
-        </motion.form>
+        </form>
 
-        <motion.div
-          className="mt-14 flex w-full justify-center"
-          initial={fadeUp.initial}
-          animate={fadeUp.animate}
-          transition={staggerDelay(4)}
+        <div
+          className="fade-up mt-14 flex w-full justify-center"
+          style={fadeIndex(4)}
         >
           <ProfilePreview />
-        </motion.div>
+        </div>
       </div>
 
       {totalProfiles >= 10 ? (
-        <motion.p
-          className="relative z-10 px-6 pb-10 text-center text-xs text-[#888888] md:px-10"
-          initial={fadeUp.initial}
-          animate={fadeUp.animate}
-          transition={staggerDelay(5)}
+        <p
+          className="fade-up relative z-10 px-6 pb-10 text-center text-xs text-[#888888] md:px-10"
+          style={fadeIndex(5)}
         >
           {countLabel} perfis analisados
-        </motion.p>
+        </p>
       ) : null}
     </section>
   );

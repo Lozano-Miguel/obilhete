@@ -11,6 +11,31 @@ body {
   background: #0a0a0a;
 }
 
+/* Staggered entrance (Hero). CSS-only so content paints before JS loads. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@layer components {
+  .fade-up {
+    animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--fade-index, 0) * 0.1s);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up {
+      animation: none;
+    }
+  }
+}
+
 /* Subtle film grain overlay (Hero) */
 @layer components {
   .hero-film-grain {
