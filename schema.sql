@@ -7,6 +7,7 @@ CREATE TABLE cached_profiles (
   films JSONB NOT NULL DEFAULT '[]',
   stats JSONB NOT NULL,
   recommendations JSONB NOT NULL DEFAULT '[]',
+  director_photos JSONB NOT NULL DEFAULT '{}',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
