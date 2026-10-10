@@ -4,11 +4,15 @@ import { FilmEntry, ProfileStats, Recommendation } from '@/types'
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
+// Groq moved the Llama family to enterprise-only, so the free tier is down to
+// the gpt-oss models. They're reasoning models: reasoning tokens come out of
+// max_tokens before any content does, so effort stays low and the budget has
+// headroom, otherwise the JSON gets truncated.
 const GROQ_MODELS = [
-  'llama-3.3-70b-versatile',
-  'meta-llama/llama-4-scout-17b-16e-instruct',
-  'llama-3.1-8b-instant',
+  'openai/gpt-oss-120b',
+  'openai/gpt-oss-20b',
 ]
+const GROQ_REASONING_EFFORT = 'low'
 
 // Normalize a title for watched-list matching: strip a leading article as a
 // whole word (before squashing), then remove all non-alphanumerics. Stripping
@@ -92,7 +96,8 @@ Return exactly this JSON structure:
           messages: [{ role: 'user', content: prompt }],
           model: model,
           temperature: 0.7,
-          max_tokens: 2000,
+          max_tokens: 4096,
+          reasoning_effort: GROQ_REASONING_EFFORT,
         })
 
         const text = completion.choices[0]?.message?.content ?? ''

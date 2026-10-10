@@ -53,8 +53,7 @@ job queue isn't warranted):
 6. **Cache upsert** — save the full profile to Postgres and return it.
 
 Groq output is forced to Portuguese and strict JSON, with a model fallback chain:
-`llama-3.3-70b-versatile` → `meta-llama/llama-4-scout-17b-16e-instruct` →
-`llama-3.1-8b-instant`.
+`openai/gpt-oss-120b` → `openai/gpt-oss-20b`.
 
 ## API routes
 
